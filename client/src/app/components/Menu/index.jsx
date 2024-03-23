@@ -7,7 +7,6 @@ import {
 } from "react-icons/fa";
 import { FaArrowRotateLeft, FaArrowRotateRight } from "react-icons/fa6";
 
-import styles from "./index.module.css";
 
 const Menu = () => {
   return (
