@@ -1,9 +1,10 @@
 "use client";
-import { COLORS } from "@/constant";
+import { COLORS, MENU_ITEMS } from "@/constant";
 import { changeBrushSize, changeColor } from "@/lib/features/toolboxSlice";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+
 
 const ToolBox = () => {
   const dispatch = useDispatch();
@@ -107,7 +108,7 @@ const ToolBox = () => {
                 <input
                   type="range"
                   min={1}
-                  max={10}
+                  max={activeMenuItem === "PENCIL" ? 10 : 50}
                   step={1}
                   onChange={updateBrushSize}
                   value={size}
