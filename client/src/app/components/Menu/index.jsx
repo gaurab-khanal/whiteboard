@@ -1,7 +1,7 @@
 "use client";
 import { MENU_ITEMS } from "@/constant";
 import { actionItemClick, menuItemClick } from "@/lib/features/menuSlice";
-import React from "react";
+import React, { useEffect } from "react";
 import { FaEraser, FaPencilAlt, FaDownload } from "react-icons/fa";
 import { FaArrowRotateLeft, FaArrowRotateRight } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +15,10 @@ const Menu = () => {
   const handleMenuClick = (item) => {
     dispatch(menuItemClick(item));
   };
+
+  const handleActionItemClick = (item)=>{
+    dispatch(actionItemClick(item))
+  }
 
   const isActive = (item) => item === activeMenuItem ? 'bg-text2' : '';
 
@@ -32,13 +36,13 @@ const Menu = () => {
       >
         <FaEraser className="text-text1 font-[20px]" />
       </div>
-      <div className="cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2">
+      <div className="cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2" onClick={()=> handleActionItemClick(MENU_ITEMS.UNDO)}>
         <FaArrowRotateLeft className="text-text1 font-[20px]" />
       </div>
-      <div className="cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2">
+      <div className="cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2" onClick={()=> handleActionItemClick(MENU_ITEMS.REDO)}>
         <FaArrowRotateRight className="text-text1 font-[20px]" />
       </div>
-      <div className="cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2">
+      <div className="cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2" onClick={()=> handleActionItemClick(MENU_ITEMS.DOWNLOAD)}>
         <FaDownload className="text-text1 font-[20px]" />
       </div>
     </div>
