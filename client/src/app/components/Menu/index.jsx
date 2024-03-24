@@ -19,7 +19,7 @@ const Menu = () => {
   const isActive = (item) => item === activeMenuItem ? 'bg-text2' : '';
 
   return (
-    <div className="absolute px-5 py-1 flex justify-between w-1/4 left-1/2 top-10 rounded-md border border-border2 border-solid translate-x-[-50%] bg-background1 shadow">
+    <div className="absolute px-5 py-1 flex justify-between w-[50%] md:w-1/4 left-1/2 top-10 rounded-md border border-border2 border-solid translate-x-[-50%] bg-background1 shadow">
       <div
         className={`cursor-pointer flex justify-center items-center h-10 w-10 rounded-md hover:bg-text2 ${isActive(MENU_ITEMS.PENCIL)}`}
         onClick={() => handleMenuClick(MENU_ITEMS.PENCIL)}
