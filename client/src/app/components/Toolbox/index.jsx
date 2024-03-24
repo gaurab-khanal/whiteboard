@@ -8,18 +8,19 @@ const ToolBox = () => {
   const dispatch = useDispatch();
 
   const { activeMenuItem } = useSelector((state) => state.menu);
+  const { color } = useSelector((state) => state.toolbox[activeMenuItem]);
 
   const updateBrushSize = (e) => {
-    console.log("Brush size changed");
     dispatch(changeBrushSize({ item: activeMenuItem, size: e.target.value }));
   };
 
   const updateColor = (e) => {
-    console.log("Brush size changed");
     const clickedColor = e.target.getAttribute("data-color");
     console.log("new color", clickedColor);
     dispatch(changeColor({ item: activeMenuItem, color: clickedColor }));
   };
+
+  const isActive = (item) => item === color ? 'border-2 border-text2 shadow-shadow2': '';
 
   return (
     <div className="p-5 absolute top-1/4 left-5 w-64 rounded-md shadow-shadow1 border border-border1 bg-background1">
@@ -31,31 +32,30 @@ const ToolBox = () => {
             onClick={(e) => updateColor(e)}
           >
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-RED hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2"
+              className={`h-5 w-5 mr-1  rounded-sm cursor-pointer bg-RED hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2 ${isActive(COLORS.RED)}`}
               data-color={COLORS.RED}
             />
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-BLACK hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2"
+              className={`h-5 w-5 mr-1 rounded-sm cursor-pointer bg-BLACK hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2 ${isActive(COLORS.BLACK)}`}
               data-color={COLORS.BLACK}
             />
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-GREEN hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2"
+              className={`h-5 w-5 mr-1 rounded-sm cursor-pointer bg-GREEN hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2 ${isActive(COLORS.GREEN)}`}
               data-color={COLORS.GREEN}
             />
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-ORANGE hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2"
+              className={`h-5 w-5 mr-1 rounded-sm cursor-pointer bg-ORANGE hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2 ${isActive(COLORS.ORANGE)}`}
               data-color={COLORS.ORANGE}
             />
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-YELLOW hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2"
-              data-color={COLORS.YELLOW}
+              className={`h-5 w-5 mr-1 rounded-sm cursor-pointer bg-YELLOW hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2 ${isActive(COLORS.YELLOW)}`}              data-color={COLORS.YELLOW}
             />
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-WHITE hover:border-[1.5px] hover:border-border2 border hover:shadow-shadow2"
+              className={`h-5 w-5 mr-1 rounded-sm cursor-pointer bg-WHITE hover:border-[1.5px] hover:border-border2 border hover:shadow-shadow2 ${isActive(COLORS.WHITE)}`}
               data-color={COLORS.WHITE}
             />
             <div
-              className="h-5 w-5 mr-1 rounded-sm cursor-pointer bg-BLUE hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2"
+              className={`h-5 w-5 mr-1 rounded-sm cursor-pointer bg-BLUE hover:border-[1.5px] hover:border-border2 hover:shadow-shadow2 ${isActive(COLORS.BLUE)}`}
               data-color={COLORS.BLUE}
             />
           </div>
