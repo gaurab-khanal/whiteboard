@@ -8,7 +8,7 @@ const ToolBox = () => {
   const dispatch = useDispatch();
 
   const { activeMenuItem } = useSelector((state) => state.menu);
-  const { color } = useSelector((state) => state.toolbox[activeMenuItem]);
+  const { color, size } = useSelector((state) => state.toolbox[activeMenuItem]);
 
   const updateBrushSize = (e) => {
     dispatch(changeBrushSize({ item: activeMenuItem, size: e.target.value }));
@@ -71,6 +71,7 @@ const ToolBox = () => {
             max={10}
             step={1}
             onChange={updateBrushSize}
+            value={size}
           />
         </div>
       </div>
