@@ -4,6 +4,7 @@ import { changeBrushSize, changeColor } from "@/lib/features/toolboxSlice";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { socket } from "@/socket";
 
 
 const ToolBox = () => {
@@ -16,12 +17,14 @@ const ToolBox = () => {
 
   const updateBrushSize = (e) => {
     dispatch(changeBrushSize({ item: activeMenuItem, size: e.target.value }));
+    socket.emit("changeConfig", {color, size: e.target.value})
   };
 
   const updateColor = (e) => {
     const clickedColor = e.target.getAttribute("data-color");
     console.log("new color", clickedColor);
     dispatch(changeColor({ item: activeMenuItem, color: clickedColor }));
+    socket.emit("changeConfig", {color: clickedColor, size})
   };
 
   const isActive = (item) =>

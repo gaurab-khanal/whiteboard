@@ -37,6 +37,11 @@ const Board = () => {
         if(historyPointer.current > 0){
           historyPointer.current -= 1;
           const imageData = drawHistory.current[historyPointer.current];
+          socket.emit("undoredo", {
+            imageData,
+            historyPointer: historyPointer.current,
+            historyStack: drawHistory.current
+          })
           context.putImageData(imageData, 0, 0)
         }else if(historyPointer.current === 0){
           historyPointer.current -= 1;
@@ -46,11 +51,34 @@ const Board = () => {
         if(historyPointer.current < drawHistory.current.length -1){
           historyPointer.current += 1;
           const imageData = drawHistory.current[historyPointer.current];
+          socket.emit("undoredo", {
+            imageData,
+            historyPointer: historyPointer.current,
+            historyStack: drawHistory.current
+          })
           context.putImageData(imageData, 0, 0)
         }
       }
+
+      const handleUndoRedo = (data) => {
+      if (actionMenuItem === MENU_ITEMS.UNDO || actionMenuItem === MENU_ITEMS.REDO) {
+          historyPointer.current = data.historyPointer;
+          const imageData = data.imageData;
+          drawHistory.current = data.historyStack; 
+          const context = canvasRef.current.getContext('2d');
+          context.putImageData(imageData, 0, 0);
+        }
+      };
       
-      dispatch(actionItemClick(null))
+      socket.on("undoredo", handleUndoRedo);
+
+    dispatch(actionItemClick(null));
+
+    return () => {
+      socket.off("undoredo", handleUndoRedo);
+    };
+
+
     }, [actionMenuItem])
 
     useEffect(()=>{
@@ -58,12 +86,24 @@ const Board = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-        const changeCanvasConfig = ()=>{
+        const changeCanvasConfig = (color, size)=>{
           
           context.strokeStyle = color;
           context.lineWidth = size;
         }
-        changeCanvasConfig();
+
+        const handleChangeConfig = (config)=>{
+          changeCanvasConfig(config.color, config.size)
+        }
+        
+        changeCanvasConfig(color, size);
+        socket.on('changeConfig', handleChangeConfig)
+
+        return ()=>{
+          socket.off('changeConfig', handleChangeConfig)
+
+        }
+        
     }, [color, size])
 
     useLayoutEffect(()=>{
@@ -88,13 +128,14 @@ const Board = () => {
 
         const handleMouseDown = (e)=>{
           shouldDraw.current = true;
-          beginPath(e.clientX, e.clientY)
-         
+          beginPath(e.clientX, e.clientY);
+          socket.emit('beginPath', {x: e.clientX, y: e.clientY})
         } 
         const handleMouseMove = (e)=>{
           if(!shouldDraw.current) return
           // draw line
           drawPath(e.clientX, e.clientY)
+          socket.emit('drawLine', {x: e.clientX, y: e.clientY})
          
         }
         const handleMouseUp = (e)=>{
@@ -104,18 +145,27 @@ const Board = () => {
           historyPointer.current = drawHistory.current.length - 1;
         }
 
+        const handleBeginPath = (path)=>{
+          beginPath(path.x, path.y)
+        } 
+        const handleDrawLine = (path)=>{
+          drawPath(path.x, path.y)
+        }
+
         canvas.addEventListener('mousedown', handleMouseDown ) 
         canvas.addEventListener('mouseup', handleMouseUp ) 
         canvas.addEventListener('mousemove', handleMouseMove ) 
 
-        socket.on("connect", ()=>{
-          console.log("Client connected")
-        })
+        socket.on('beginPath', handleBeginPath)
+        socket.on('drawLine', handleDrawLine)
 
         return ()=>{
           canvas.removeEventListener('mousedown', handleMouseDown ) 
           canvas.removeEventListener('mouseup', handleMouseUp ) 
           canvas.removeEventListener('mousemove', handleMouseMove ) 
+
+          socket.off('beginPath', handleBeginPath)
+          socket.off('drawLine', handleDrawLine)
         }
     }, [])
 

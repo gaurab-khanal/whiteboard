@@ -1,6 +1,7 @@
 "use client";
 import { MENU_ITEMS } from "@/constant";
 import { actionItemClick, menuItemClick } from "@/lib/features/menuSlice";
+import { socket } from "@/socket";
 import React, { useEffect } from "react";
 import { FaEraser, FaPencilAlt, FaDownload } from "react-icons/fa";
 import { FaArrowRotateLeft, FaArrowRotateRight } from "react-icons/fa6";
@@ -9,12 +10,18 @@ import { useDispatch, useSelector } from "react-redux";
 const Menu = () => {
 
   const {activeMenuItem} = useSelector((state)=> state.menu);
+  const { color, size } = useSelector((state) => state.toolbox[activeMenuItem]);
 
   const dispatch = useDispatch();
 
   const handleMenuClick = (item) => {
     dispatch(menuItemClick(item));
+  
   };
+
+  useEffect(()=>{
+    socket.emit("changeConfig", {color, size})
+  }, [color, size])
 
   const handleActionItemClick = (item)=>{
     dispatch(actionItemClick(item))
