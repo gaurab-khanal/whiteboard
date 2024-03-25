@@ -39,10 +39,11 @@ const Board = () => {
           const imageData = drawHistory.current[historyPointer.current];
           context.putImageData(imageData, 0, 0)
         }else if(historyPointer.current === 0){
+          historyPointer.current -= 1;
           context.clearRect(0, 0, canvas.width, canvas.height);
         }
       }else if (actionMenuItem === MENU_ITEMS.REDO){
-        if(historyPointer.current < drawHistory.current.length - 1){
+        if(historyPointer.current < drawHistory.current.length -1){
           historyPointer.current += 1;
           const imageData = drawHistory.current[historyPointer.current];
           context.putImageData(imageData, 0, 0)
