@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://whiteboard-nine-xi.vercel.app/"]
 }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: ["http://localhost:3000", "https://whiteboard-nine-xi.vercel.app/"]});
