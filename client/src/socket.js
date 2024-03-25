@@ -1,3 +1,5 @@
 import {io} from "socket.io-client";
 
-export const socket = io("http://localhost:4000");
+const url = process.env.NODE_ENV === "development" ? "http://localhost:4000" : "https://whiteboard-7h91.onrender.com/";
+
+export const socket = io(url);

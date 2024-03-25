@@ -8,7 +8,7 @@ app.use(cors({
     origin: "http://localhost:3000",
 }));
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cors: "http://localhost:3000"});
+const io = new Server(httpServer, { cors: ["http://localhost:3000", "https://whiteboard-nine-xi.vercel.app/"]});
 
 
 io.on("connection", (socket) => {
@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
   socket.on("drawLine", (data)=>{
     socket.broadcast.emit("drawLine", data)
   })
-  
+
   socket.on("changeConfig", (data)=>{
     socket.broadcast.emit("changeConfig", data)
   })
