@@ -4,14 +4,24 @@ import React, { useEffect, useLayoutEffect,useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { actionItemClick } from "@/lib/features/menuSlice";
 import { socket } from '@/socket';
+import { Base64ToImageData, imageDataToBase64 } from '@/app/utils/imgDataToBase64ViceVersa';
 
 
 
 const Board = () => {
 
+  const {roomId} = useSelector((state)=> state.roomId) ;
   const drawHistory = useRef([]);
   const historyPointer = useRef(-1);
-  const {activeMenuItem, actionMenuItem} = useSelector((state)=> state.menu);
+  const roomIdRef = useRef(null);
+ const {activeMenuItem, actionMenuItem} = useSelector((state)=> state.menu);
+
+
+ useEffect(() => {
+  console.log("Room ID in Board component:", roomId); // Log the roomId
+  roomIdRef.current = roomId; // Update the ref
+  console.log("Room ID in Board  ref component:", roomIdRef.current); // Log the roomId
+}, [roomId]); 
 
   const shouldDraw = useRef(false);
 
@@ -36,12 +46,9 @@ const Board = () => {
       }else if (actionMenuItem === MENU_ITEMS.UNDO){
         if(historyPointer.current > 0){
           historyPointer.current -= 1;
+          console.log("undo:  :  ", historyPointer.current, drawHistory.current)
           const imageData = drawHistory.current[historyPointer.current];
-          socket.emit("undoredo", {
-            imageData,
-            historyPointer: historyPointer.current,
-            historyStack: drawHistory.current
-          })
+          console.log(imageData)
           context.putImageData(imageData, 0, 0)
         }else if(historyPointer.current === 0){
           historyPointer.current -= 1;
@@ -51,11 +58,6 @@ const Board = () => {
         if(historyPointer.current < drawHistory.current.length -1){
           historyPointer.current += 1;
           const imageData = drawHistory.current[historyPointer.current];
-          socket.emit("undoredo", {
-            imageData,
-            historyPointer: historyPointer.current,
-            historyStack: drawHistory.current
-          })
           context.putImageData(imageData, 0, 0)
         }
       }
@@ -129,33 +131,48 @@ const Board = () => {
         const handleMouseDown = (e)=>{
           shouldDraw.current = true;
           beginPath(e.clientX, e.clientY);
-          socket.emit('beginPath', {x: e.clientX, y: e.clientY})
+          socket.emit('beginPath', {x: e.clientX, y: e.clientY, roomId: roomIdRef.current})
         } 
         const handleMouseMove = (e)=>{
           if(!shouldDraw.current) return
           // draw line
           drawPath(e.clientX, e.clientY)
-          socket.emit('drawLine', {x: e.clientX, y: e.clientY})
+          socket.emit('drawLine', {x: e.clientX, y: e.clientY, roomId: roomIdRef.current})
          
         }
         const handleMouseUp = (e)=>{
           shouldDraw.current = false;
           const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
           drawHistory.current.push(imageData);
+          console.log("roodsd: ", roomIdRef.current)
+          const b64Img = imageDataToBase64(imageData);
           historyPointer.current = drawHistory.current.length - 1;
+          console.log("MOuse uP: ",drawHistory.current, historyPointer.current)
+          socket.emit("drawHistory", {drawHistory: b64Img, historyPointer: historyPointer.current, roomId: roomIdRef.current})
         }
 
         const handleBeginPath = (path)=>{
+          console.log("sjkkshdhgdfhf: ", path)
           beginPath(path.x, path.y)
         } 
         const handleDrawLine = (path)=>{
           drawPath(path.x, path.y)
         }
 
+      
+        const handleDrawHistoryArray = (data)=>{
+          const b64ToImageData = Base64ToImageData(data.drawHistory)
+          drawHistory.current.push(b64ToImageData)
+          historyPointer.current = data.historyPointer 
+          console.log("emit: ",drawHistory.current, historyPointer.current)
+        }
+
+
         canvas.addEventListener('mousedown', handleMouseDown ) 
         canvas.addEventListener('mouseup', handleMouseUp ) 
         canvas.addEventListener('mousemove', handleMouseMove ) 
 
+        socket.on("drawHistory", handleDrawHistoryArray)
         socket.on('beginPath', handleBeginPath)
         socket.on('drawLine', handleDrawLine)
 
@@ -164,6 +181,7 @@ const Board = () => {
           canvas.removeEventListener('mouseup', handleMouseUp ) 
           canvas.removeEventListener('mousemove', handleMouseMove ) 
 
+          socket.off("drawHistory", handleDrawHistoryArray)
           socket.off('beginPath', handleBeginPath)
           socket.off('drawLine', handleDrawLine)
         }
